@@ -12,7 +12,7 @@ These Libary's are made for my IPASS project TI-HBO-ICT.
 
 
 Teachers:
-Wouter van Ooijen
+Wouter van Ooijen;
 Marius Versteegen
 
 
