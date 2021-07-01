@@ -11,15 +11,16 @@
 
 /// \brief
 /// Defines for basis registers
-/// details
+/// \details
 /// These registers are made so I only have to give a pin number. With those numbers I can go on.
-/// Credits naar Rogier van Rooijen met het idee
+/// Credits tho Rogier van Rooijen with the idea
 /// \note
-/// This only works if you just use one PCA9685 chip
+/// This only works if you just use one PCA9685 chip, two or more hasn't bin tested
 #define pinOnLow 0x06
 #define pinOnHigh 0x07
 #define pinOffLow 0x08
 #define pinOffHigh 0x09
+#define mode1Register 0x00
 
 PCA9685::PCA9685(hwlib::i2c_bus &i2c, uint8_t pin, uint8_t i2cAddress):
 i2c(i2c),
@@ -29,15 +30,6 @@ On_Low(pin * 4 + pinOnLow),
 Off_High(pin * 4 + pinOffHigh),
 Off_Low(pin * 4 + pinOffLow)
 {}
-
-//PCA9685::PCA9685(hwlib::i2c_bus &i2c, uint8_t On_High, uint8_t On_Low, uint8_t Off_High, uint8_t Off_Low, uint8_t i2cAddress):
-//i2c(i2c),
-//i2cAddress(i2cAddress),
-//On_High(On_High),
-//On_Low(On_Low),
-//Off_High(Off_High),
-//Off_Low(Off_Low)
-//{}
 
 /// \brief
 /// Set SLEEP on 0 in MODE1 register.
@@ -49,7 +41,7 @@ Off_Low(pin * 4 + pinOffLow)
 /// Only the ALLCALL stays on 1, rest is 0.
 void PCA9685::modeOffSleep(){
     auto trans = i2c.write(i2cAddress);
-    trans.write(0x00);
+    trans.write(mode1Register);
     trans.write(0x01);
     hwlib::wait_ms(1);
 }
@@ -62,7 +54,7 @@ void PCA9685::modeOffSleep(){
 /// This is needed for the SLEEP register
 void PCA9685::modeZero(){
     auto trans = i2c.write(i2cAddress);
-    trans.write(0x00);
+    trans.write(mode1Register);
     trans.write(0x00);
     hwlib::wait_ms(1);
 }
@@ -74,7 +66,7 @@ void PCA9685::modeZero(){
 /// This is: 00010001
 void PCA9685::modeDefault(){
     auto trans = i2c.write(i2cAddress);
-    trans.write(0x00);
+    trans.write(mode1Register);
     trans.write(0x11);
     hwlib::wait_ms(1);
 }
@@ -136,13 +128,10 @@ void PCA9685::frequentie(float Hz){
 /// We make the servo start at the beginning of a new round/PWM wave.
 void PCA9685::setServo(int graden){
     int gradenInByte = graden * 2 + 102;
-//    hwlib::cout<<gradenInByte<<" de graden in byte\n";
     uint8_t begin = 0x00;
     uint16_t totaal = gradenInByte;
     uint8_t dataHigh = totaal>>8;
     uint8_t dataLow = totaal;
-//    hwlib::cout<<dataHigh<<" de graden in HIGH byte\n";
-//    hwlib::cout<<dataLow<<" de graden in  LOW byte\n";
     write(On_High, begin);
     write(On_Low, begin);
     write(Off_High,dataHigh);
@@ -155,7 +144,7 @@ void PCA9685::setServo(int graden){
 /// \details
 /// This is sett on a standard servo option.
 /// Set it one 90 degrees.
-void PCA9685::setServoHalfOpen(){
+void PCA9685::setServo90(){
     setServo(90);
 }
 
@@ -164,7 +153,7 @@ void PCA9685::setServoHalfOpen(){
 /// \details
 /// This is sett on a standard servo option.
 /// Set it one 180 degrees.
-void PCA9685::setServoOpen(){
+void PCA9685::setServo180(){
     setServo(180);
 }
 
@@ -173,13 +162,13 @@ void PCA9685::setServoOpen(){
 /// \details
 /// This is sett on a standard servo option.
 /// Set it one 0 degrees.
-void PCA9685::setServoDicht(){
+void PCA9685::setServo0(){
     setServo(0);
 }
 
-void PCA9685::printRegisters(){
-    hwlib::cout<<On_Low<<"\n";
-    hwlib::cout<<On_High<<"\n";
-    hwlib::cout<<Off_Low<<"\n";
-    hwlib::cout<<Off_High<<"\n";
-}
+//void PCA9685::printRegisters(){
+//    hwlib::cout<<On_Low<<"\n";
+//    hwlib::cout<<On_High<<"\n";
+//    hwlib::cout<<Off_Low<<"\n";
+//    hwlib::cout<<Off_High<<"\n";
+//}
